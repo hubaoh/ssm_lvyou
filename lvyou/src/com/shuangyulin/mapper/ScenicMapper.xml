@@ -1,0 +1,50 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.shuangyulin.mapper.ScenicMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加景点记录 -->
+	<insert id="addScenic" parameterType="scenic">
+		insert into t_scenic(cityObj,scenicTypeObj,dengji,scenicName,scenicPhoto,scenicDesc,price,openTime,address) values 
+		(#{cityObj.cityNo},#{scenicTypeObj.typeId},#{dengji},#{scenicName},#{scenicPhoto},#{scenicDesc},#{price},#{openTime},#{address})
+	</insert>
+
+	<!-- 按照查询条件分页查询景点记录 -->
+	<select id="queryScenic" resultMap="scenicMap" >
+		select t_scenic.* from t_scenic,t_city,t_scenicType ${where} and t_scenic.cityObj = t_city.cityNo and t_scenic.scenicTypeObj = t_scenicType.typeId limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="scenicMap" type="scenic">
+        <id property="scenicId" column="scenicId" />
+        <association property="cityObj" column="cityObj" select="com.shuangyulin.mapper.CityMapper.getCity" />
+        <association property="scenicTypeObj" column="scenicTypeObj" select="com.shuangyulin.mapper.ScenicTypeMapper.getScenicType" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有景点记录 -->
+	<select id="queryScenicList" resultMap="scenicMap" >
+		select t_scenic.* from t_scenic,t_city,t_scenicType ${where} and t_scenic.cityObj = t_city.cityNo and t_scenic.scenicTypeObj = t_scenicType.typeId
+	</select>
+
+    <!-- 按照查询条件的景点记录数 -->
+	<select id="queryScenicCount" resultType="int">
+		select count(*) from t_scenic,t_city,t_scenicType ${where} and t_scenic.cityObj = t_city.cityNo and t_scenic.scenicTypeObj = t_scenicType.typeId
+	</select>
+
+	<!-- 根据主键查询某个景点记录 -->
+	<select id="getScenic" parameterType="int" resultMap="scenicMap">
+		select * from t_scenic where t_scenic.scenicId = #{scenicId}
+	</select>
+
+	<!-- 更新景点记录 -->
+	<update id="updateScenic" parameterType="scenic">
+		update t_scenic set cityObj=#{cityObj.cityNo},scenicTypeObj=#{scenicTypeObj.typeId},dengji=#{dengji},scenicName=#{scenicName},scenicPhoto=#{scenicPhoto},scenicDesc=#{scenicDesc},price=#{price},openTime=#{openTime},address=#{address} where scenicId = #{scenicId}
+	</update>
+
+	<!-- 删除景点记录 -->
+	<delete id="deleteScenic" parameterType="int">
+		delete from t_scenic where scenicId=#{scenicId}
+	</delete>
+
+</mapper>
